@@ -13,11 +13,38 @@ class InertiaAppIntegration
 
     public function install(Module $module): void
     {
-        $this->ensureResolveInAppTsx();
-        $this->ensureModuleViteDirectiveInBlade();
+        $this->patchComposerAutoload();
+        $this->patchAppTsx();
+        $this->patchAppBlade();
     }
 
-    protected function ensureResolveInAppTsx(): void
+    protected function patchComposerAutoload(): void
+    {
+        $path = base_path('composer.json');
+
+        if (! $this->files->exists($path)) {
+            return;
+        }
+
+        $composer = json_decode($this->files->get($path), true);
+
+        if (! is_array($composer)) {
+            return;
+        }
+
+        $autoload = $composer['autoload']['psr-4'] ?? [];
+
+        if (isset($autoload['Modules\\'])) {
+            return;
+        }
+
+        $autoload['Modules\\'] = 'Modules/';
+        $composer['autoload']['psr-4'] = $autoload;
+
+        $this->files->put($path, json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+    }
+
+    protected function patchAppTsx(): void
     {
         $path = base_path('resources/js/app.tsx');
 
@@ -27,20 +54,28 @@ class InertiaAppIntegration
 
         $content = $this->files->get($path);
 
-        if (str_contains($content, 'name.includes(\'::\')')) {
+        if (str_contains($content, "name.includes('::')")) {
             return;
         }
 
-        $content = str_replace(
-            "void createInertiaApp({\n    title:",
-            "void createInertiaApp({\n    resolve: (name) => {\n        if (name.includes('::')) {\n            const [module, ...pageParts] = name.split('::');\n            const pagePath = pageParts.join('/');\n\n            return import(`../Modules/${module}/Resources/js/pages/${pagePath}`);\n        }\n\n        return import(`../pages/${name}`);\n    },\n    title:",
-            $content
-        );
+        $needle = "void createInertiaApp({\n    title:";
+
+        if (! str_contains($content, $needle)) {
+            $needle = "void createInertiaApp({\r\n    title:";
+        }
+
+        if (! str_contains($content, $needle)) {
+            return;
+        }
+
+        $replacement = "void createInertiaApp({\n    resolve: (name) => {\n        if (name.includes('::')) {\n            const [module, ...pageParts] = name.split('::');\n            const pagePath = pageParts.join('/');\n\n            return import(`../Modules/\${module}/Resources/js/pages/\${pagePath}`);\n        }\n\n        return import(`../pages/\${name}`);\n    },\n    title:";
+
+        $content = str_replace($needle, $replacement, $content);
 
         $this->files->put($path, $content);
     }
 
-    protected function ensureModuleViteDirectiveInBlade(): void
+    protected function patchAppBlade(): void
     {
         $path = base_path('resources/views/app.blade.php');
 
@@ -54,11 +89,15 @@ class InertiaAppIntegration
             return;
         }
 
-        $content = str_replace(
-            "@vite(['resources/css/app.css', 'resources/js/app.tsx', \"resources/js/pages/{$page['component']}.tsx\"])",
-            "@vite(['resources/css/app.css', 'resources/js/app.tsx'])\n        @if (! str_contains(\$page['component'], '::'))\n            @vite(\"resources/js/pages/{$page['component']}.tsx\")\n        @endif",
-            $content
-        );
+        $needle = "@vite(['resources/css/app.css', 'resources/js/app.tsx', \"resources/js/pages/{\$page['component']}.tsx\"])";
+
+        if (! str_contains($content, $needle)) {
+            return;
+        }
+
+        $replacement = "@vite(['resources/css/app.css', 'resources/js/app.tsx'])\n        @if (! str_contains(\$page['component'], '::'))\n            @vite(\"resources/js/pages/{\$page['component']}.tsx\")\n        @endif";
+
+        $content = str_replace($needle, $replacement, $content);
 
         $this->files->put($path, $content);
     }

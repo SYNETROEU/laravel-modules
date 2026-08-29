@@ -52,9 +52,11 @@ class ModuleMakeCommand extends Command
         $this->info("Module [{$name}] created successfully!");
         $this->line('');
         $this->line('Next steps:');
-        $this->line("  1. Run: php artisan module:enable {$name}");
-        $this->line("  2. Visit: /{$slug}");
+        $this->line('  1. Run: composer dump-autoload');
+        $this->line("  2. Run: php artisan module:enable {$name}");
+        $this->line("  3. Visit: /{$slug}");
 
+        $modules->clear();
         $modules->discover();
         $module = $modules->find($name);
 
