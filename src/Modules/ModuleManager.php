@@ -196,6 +196,10 @@ class ModuleManager implements ModuleManagerInterface
         $this->modules[$name] = Module::fromMetadata($modulePath, $metadata);
         $this->categorizeModules();
 
+        if (config('modules.cache', true)) {
+            $this->cache->put($this->modulesToArrays($this->modules));
+        }
+
         event(new ModuleEnabled($module));
     }
 
@@ -232,6 +236,10 @@ class ModuleManager implements ModuleManagerInterface
 
         $this->modules[$name] = Module::fromMetadata($modulePath, $metadata);
         $this->categorizeModules();
+
+        if (config('modules.cache', true)) {
+            $this->cache->put($this->modulesToArrays($this->modules));
+        }
 
         event(new ModuleDisabled($module));
     }

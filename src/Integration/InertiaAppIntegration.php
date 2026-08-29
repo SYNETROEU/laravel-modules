@@ -68,7 +68,7 @@ class InertiaAppIntegration
             return;
         }
 
-        $replacement = "void createInertiaApp({\n    resolve: (name) => {\n        if (name.includes('::')) {\n            const [module, ...pageParts] = name.split('::');\n            const pagePath = pageParts.join('/');\n\n            return import(`../Modules/\${module}/Resources/js/pages/\${pagePath}`);\n        }\n\n        return import(`../pages/\${name}`);\n    },\n    title:";
+        $replacement = "void createInertiaApp({\n    resolve: (name) => {\n        if (name.includes('::')) {\n            const [module, ...pageParts] = name.split('::');\n            const pagePath = pageParts.join('/');\n\n            return import(`../../Modules/\${module}/Resources/js/pages/\${pagePath}`);\n        }\n\n        return import(`./pages/\${name}`);\n    },\n    title:";
 
         $content = str_replace($needle, $replacement, $content);
 
