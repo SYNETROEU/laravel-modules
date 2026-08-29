@@ -77,7 +77,7 @@ class FrontendManager
     protected function discoverPages(string $module, string $frontendPath): array
     {
         $pages = [];
-        $pagesDir = "{$frontendPath}/Pages";
+        $pagesDir = "{$frontendPath}/pages";
 
         if (! $this->files->isDirectory($pagesDir)) {
             return $pages;
@@ -107,8 +107,8 @@ class FrontendManager
         $entries = [];
 
         $possibleEntries = [
-            'Resources/js/Pages/index.tsx',
-            'Resources/js/Pages/index.jsx',
+            'Resources/js/pages/index.tsx',
+            'Resources/js/pages/index.jsx',
             'Resources/js/index.ts',
             'Resources/js/index.js',
         ];
@@ -126,7 +126,7 @@ class FrontendManager
 
     protected function resolvePageName(string $relativePath): string
     {
-        $path = str_replace(['Pages/', 'Pages\\'], '', $relativePath);
+        $path = str_replace(['pages/', 'pages\\'], '', $relativePath);
         $path = preg_replace('/\.(tsx|jsx|ts|js)$/', '', $path);
 
         return $path;

@@ -165,7 +165,7 @@ PHP;
 
     protected function createPage(string $modulePath, string $filename, string $moduleName, Filesystem $files): void
     {
-        $pagesDir = "{$modulePath}/Resources/js/Pages";
+        $pagesDir = "{$modulePath}/Resources/js/pages";
         $functionName = str_replace('.', '_', $filename);
 
         $content = <<<TSX
@@ -194,7 +194,7 @@ export default function {$functionName}() {
 TSX;
 
         $files->put("{$pagesDir}/{$filename}", $content);
-        $this->info("  ✓ Resources/js/Pages/{$filename}");
+        $this->info("  ✓ Resources/js/pages/{$filename}");
     }
 
     protected function createComponent(string $modulePath, string $filename, Filesystem $files): void

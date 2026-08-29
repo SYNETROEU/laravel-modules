@@ -74,7 +74,7 @@ return [
         'Services',
         'Database/factories',
         'Database/migrations',
-        'Resources/js/Pages',
+        'Resources/js/pages',
         'Resources/js/Components',
         'Resources/js/Layouts',
         'Resources/js/hooks',
@@ -110,8 +110,8 @@ return [
         'enabled' => true,
         'auto_discover' => true,
         'entry_points' => [
-            'Resources/js/Pages/**/*.tsx',
-            'Resources/js/Pages/**/*.jsx',
+            'Resources/js/pages/**/*.tsx',
+            'Resources/js/pages/**/*.jsx',
         ],
     ],
 

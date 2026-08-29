@@ -43,7 +43,7 @@ class InertiaPageResolver
         $parts = explode('/', $pageKey);
         $filename = array_pop($parts);
 
-        $path = $directory.'/'.$module.'/Resources/js/Pages';
+        $path = $directory.'/'.$module.'/Resources/js/pages';
 
         foreach ($parts as $part) {
             $path .= '/'.$part;

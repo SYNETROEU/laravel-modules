@@ -19,6 +19,8 @@ use Synetro\LaravelModules\Events\ModuleRemoved;
 use Synetro\LaravelModules\Exceptions\CircularDependencyException;
 use Synetro\LaravelModules\Exceptions\ModuleDependencyException;
 use Synetro\LaravelModules\Exceptions\ModuleNotFoundException;
+use Synetro\LaravelModules\Exceptions\ModuleAlreadyEnabledException;
+use Synetro\LaravelModules\Exceptions\ModuleAlreadyDisabledException;
 use Synetro\LaravelModules\Support\ModuleCache;
 
 class ModuleManager implements ModuleManagerInterface
@@ -47,6 +49,14 @@ class ModuleManager implements ModuleManagerInterface
     public function discover(): void
     {
         if ($this->discovered) {
+            return;
+        }
+
+        $cached = $this->cache->get();
+
+        if (! empty($cached)) {
+            $this->loadFromCache();
+
             return;
         }
 
@@ -81,9 +91,39 @@ class ModuleManager implements ModuleManagerInterface
         $this->categorizeModules();
 
         if (config('modules.cache', true)) {
-            $this->cache->put($modules);
+            $this->cache->put($this->modulesToArrays($modules));
         }
 
+        $this->discovered = true;
+    }
+
+    protected function modulesToArrays(array $modules): array
+    {
+        $arrays = [];
+
+        foreach ($modules as $name => $module) {
+            $arrays[$name] = $module->toArray();
+        }
+
+        return $arrays;
+    }
+
+    protected function loadFromCache(): void
+    {
+        $cached = $this->cache->get();
+
+        if (empty($cached)) {
+            return;
+        }
+
+        $modules = [];
+
+        foreach ($cached as $name => $data) {
+            $modules[$name] = Module::fromMetadata($data['path'], $data);
+        }
+
+        $this->modules = $modules;
+        $this->categorizeModules();
         $this->discovered = true;
     }
 
