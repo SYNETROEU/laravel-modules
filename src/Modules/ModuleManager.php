@@ -10,7 +10,12 @@ use Illuminate\Support\Facades\Cache;
 use Synetro\LaravelModules\Contracts\ModuleManagerInterface;
 use Synetro\LaravelModules\Events\ModuleEnabled;
 use Synetro\LaravelModules\Events\ModuleEnabling;
+use Synetro\LaravelModules\Events\ModuleDisabling;
+use Synetro\LaravelModules\Events\ModuleDisabled;
 use Synetro\LaravelModules\Events\ModuleInstalling;
+use Synetro\LaravelModules\Events\ModuleInstalled;
+use Synetro\LaravelModules\Events\ModuleRemoving;
+use Synetro\LaravelModules\Events\ModuleRemoved;
 use Synetro\LaravelModules\Exceptions\CircularDependencyException;
 use Synetro\LaravelModules\Exceptions\ModuleDependencyException;
 use Synetro\LaravelModules\Exceptions\ModuleNotFoundException;
@@ -30,6 +35,14 @@ class ModuleManager implements ModuleManagerInterface
         protected Filesystem $files,
         protected ModuleCache $cache,
     ) {}
+
+    public function clear(): void
+    {
+        $this->modules = [];
+        $this->enabledModules = [];
+        $this->disabledModules = [];
+        $this->discovered = false;
+    }
 
     public function discover(): void
     {
@@ -140,7 +153,7 @@ class ModuleManager implements ModuleManagerInterface
 
         $this->files->put($metadataPath, json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-        $this->modules[$name] = $module;
+        $this->modules[$name] = Module::fromMetadata($modulePath, $metadata);
         $this->categorizeModules();
 
         event(new ModuleEnabled($module));
@@ -177,7 +190,7 @@ class ModuleManager implements ModuleManagerInterface
 
         $this->files->put($metadataPath, json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-        $this->modules[$name] = $module;
+        $this->modules[$name] = Module::fromMetadata($modulePath, $metadata);
         $this->categorizeModules();
 
         event(new ModuleDisabled($module));

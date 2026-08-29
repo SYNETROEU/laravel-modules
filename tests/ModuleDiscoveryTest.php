@@ -15,6 +15,8 @@ class ModuleDiscoveryTest extends TestCase
 
         $this->createModule('Blog');
         $this->createModule('Ecommerce');
+
+        $this->app->make(ModuleManagerInterface::class)->clear();
     }
 
     public function test_discovers_modules(): void
@@ -45,7 +47,7 @@ class ModuleDiscoveryTest extends TestCase
         $modules = $this->app->make(ModuleManagerInterface::class);
         $blog = $modules->find('Blog');
 
-        $this->assertStringContainsString('Modules/Blog', $blog->path());
+        $this->assertStringContainsString('Modules'.DIRECTORY_SEPARATOR.'Blog', $blog->path());
     }
 
     public function test_enabled_modules_returns_only_enabled(): void

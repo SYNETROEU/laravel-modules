@@ -35,15 +35,19 @@ class ModuleDoctorCommand extends Command
             ];
         }
 
-        $rows = collect($checks)->map(fn ($c) => [
-            $c['name'],
-            match ($c['status']) {
+        $rows = collect($checks)->map(function ($c) {
+            $status = match ($c['status']) {
                 'pass' => 'OK',
                 'warn' => 'WARN',
                 default => 'FAIL',
-            ],
-            $c['message'],
-        ])->toArray();
+            };
+
+            return [
+                $c['name'],
+                $status,
+                $c['message'],
+            ];
+        })->toArray();
 
         $this->table(['Module', 'Status', 'Message'], $rows);
 

@@ -22,6 +22,7 @@ class ModuleSecurityTest extends TestCase
         $this->createModule('NormalModule');
 
         $modules = $this->app->make(ModuleManagerInterface::class);
+        $modules->clear();
 
         $this->assertTrue($modules->has('NormalModule'));
     }

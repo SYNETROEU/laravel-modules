@@ -24,6 +24,7 @@ class ModuleDependencyTest extends TestCase
 
         $this->createModule('Base', ['enabled' => true]);
         $this->createModule('Feature', ['enabled' => false, 'dependencies' => ['Base' => '^1.0']]);
+        $modules->clear();
 
         $this->assertTrue($modules->isEnabled('Base'));
         $this->assertFalse($modules->isEnabled('Feature'));

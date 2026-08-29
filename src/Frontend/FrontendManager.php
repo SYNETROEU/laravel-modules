@@ -86,7 +86,9 @@ class FrontendManager
         $files = $this->files->allFiles($pagesDir);
 
         foreach ($files as $file) {
-            if (! str_ends_with($file->getFilename(), ['.tsx', '.jsx', '.ts', '.js'])) {
+            $filename = $file->getFilename();
+
+            if (! in_array(strtolower(pathinfo($filename, PATHINFO_EXTENSION)), ['tsx', 'jsx', 'ts', 'js'])) {
                 continue;
             }
 
@@ -125,7 +127,7 @@ class FrontendManager
     protected function resolvePageName(string $relativePath): string
     {
         $path = str_replace(['Pages/', 'Pages\\'], '', $relativePath);
-        $path = pathinfo($path, PATHINFO_FILENAME);
+        $path = preg_replace('/\.(tsx|jsx|ts|js)$/', '', $path);
 
         return $path;
     }
@@ -134,5 +136,10 @@ class FrontendManager
     {
         $this->pages = [];
         $this->entryPoints = [];
+    }
+
+    public function register(): void
+    {
+        $this->discover();
     }
 }

@@ -12,6 +12,7 @@ class ModuleApiTest extends TestCase
     {
         $this->createModule('ApiTest');
         $modules = $this->app->make(ModuleManagerInterface::class);
+        $modules->clear();
 
         $all = $modules->all();
 
@@ -23,6 +24,7 @@ class ModuleApiTest extends TestCase
     {
         $this->createModule('ApiTest');
         $modules = $this->app->make(ModuleManagerInterface::class);
+        $modules->clear();
 
         $module = $modules->find('ApiTest');
 
@@ -34,6 +36,7 @@ class ModuleApiTest extends TestCase
     {
         $this->createModule('ApiTest');
         $modules = $this->app->make(ModuleManagerInterface::class);
+        $modules->clear();
 
         $this->assertTrue($modules->has('ApiTest'));
         $this->assertFalse($modules->has('NonExistent'));
@@ -43,8 +46,8 @@ class ModuleApiTest extends TestCase
     {
         $this->createModule('EnabledTest', ['enabled' => true]);
         $this->createModule('DisabledTest', ['enabled' => false]);
-
         $modules = $this->app->make(ModuleManagerInterface::class);
+        $modules->clear();
 
         $this->assertTrue($modules->isEnabled('EnabledTest'));
         $this->assertFalse($modules->isEnabled('DisabledTest'));
@@ -54,10 +57,11 @@ class ModuleApiTest extends TestCase
     {
         $this->createModule('PathTest');
         $modules = $this->app->make(ModuleManagerInterface::class);
+        $modules->clear();
 
         $path = $modules->path('PathTest');
 
         $this->assertNotNull($path);
-        $this->assertStringContainsString('Modules/PathTest', $path);
+        $this->assertStringContainsString('Modules'.DIRECTORY_SEPARATOR.'PathTest', $path);
     }
 }

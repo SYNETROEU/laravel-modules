@@ -12,7 +12,9 @@ class FrontendDiscoveryTest extends TestCase
     public function test_discovers_frontend_pages(): void
     {
         $path = $this->modulesPath().'/Blog/Resources/js/Pages';
-        (new \Illuminate\Filesystem\Filesystem())->ensureDirectoryExists($path);
+        $filesystem = new \Illuminate\Filesystem\Filesystem();
+        $filesystem->ensureDirectoryExists($path);
+        $filesystem->ensureDirectoryExists($path.'/Posts');
         file_put_contents($path.'/Index.tsx', '<div>Blog Index</div>');
         file_put_contents($path.'/Posts/Show.tsx', '<div>Post Show</div>');
 

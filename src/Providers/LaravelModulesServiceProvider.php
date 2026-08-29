@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Synetro\LaravelModules\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Filesystem\Filesystem;
+use Synetro\LaravelModules\Contracts\ModuleManagerInterface;
 use Synetro\LaravelModules\Modules\ModuleManager;
 use Synetro\LaravelModules\Frontend\FrontendManager;
 use Synetro\LaravelModules\Inertia\InertiaPageResolver;
@@ -18,26 +20,26 @@ class LaravelModulesServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../../config/modules.php', 'modules');
 
         $this->app->singleton(ModuleManager::class, function ($app) {
-            return new ModuleManager($app);
+            return new ModuleManager($app->make(Filesystem::class), $app->make(ModuleCache::class));
         });
 
         $this->app->singleton(FrontendManager::class, function ($app) {
-            return new FrontendManager($app);
+            return new FrontendManager($app->make(Filesystem::class), $app->make(ModuleCache::class));
         });
 
         $this->app->singleton(InertiaPageResolver::class, function ($app) {
-            return new InertiaPageResolver($app);
+            return new InertiaPageResolver($app->make(Filesystem::class), $app->make(FrontendManager::class));
         });
 
         $this->app->singleton(ModuleRouteRegistrar::class, function ($app) {
-            return new ModuleRouteRegistrar($app);
+            return new ModuleRouteRegistrar($app->make(ModuleManagerInterface::class), $app->make(Filesystem::class));
         });
 
         $this->app->singleton(ModuleCache::class, function ($app) {
-            return new ModuleCache($app);
+            return new ModuleCache($app->make(Filesystem::class));
         });
 
-        $this->app->singleton(\Synetro\LaravelModules\Contracts\ModuleManagerInterface::class, ModuleManager::class);
+        $this->app->singleton(ModuleManagerInterface::class, ModuleManager::class);
     }
 
     public function boot(): void

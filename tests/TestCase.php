@@ -10,6 +10,8 @@ use Synetro\LaravelModules\Providers\LaravelModulesServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
+    protected ?string $tempBase = null;
+
     protected function getPackageProviders($app): array
     {
         return [
@@ -32,13 +34,15 @@ abstract class TestCase extends BaseTestCase
 
     protected function tempPath(string $path = ''): string
     {
-        $base = sys_get_temp_dir().'/laravel-modules-'.uniqid();
-
-        if ($path) {
-            $base .= '/'.$path;
+        if ($this->tempBase === null) {
+            $this->tempBase = sys_get_temp_dir().'/laravel-modules-'.uniqid();
         }
 
-        return $base;
+        if ($path) {
+            return $this->tempBase.'/'.$path;
+        }
+
+        return $this->tempBase;
     }
 
     protected function createModule(string $name, array $metadata = []): string

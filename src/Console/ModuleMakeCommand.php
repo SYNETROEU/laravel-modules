@@ -166,11 +166,12 @@ PHP;
     protected function createPage(string $modulePath, string $filename, string $moduleName, Filesystem $files): void
     {
         $pagesDir = "{$modulePath}/Resources/js/Pages";
+        $functionName = str_replace('.', '_', $filename);
 
         $content = <<<TSX
 import { Head, Link } from '@inertiajs/react';
 
-export default function {$filename.':'}() {
+export default function {$functionName}() {
     return (
         <div className="p-6">
             <Head title="{$moduleName}" />
@@ -199,6 +200,7 @@ TSX;
     protected function createComponent(string $modulePath, string $filename, Filesystem $files): void
     {
         $componentsDir = "{$modulePath}/Resources/js/Components";
+        $componentName = str_replace('.', '_', $filename);
 
         $content = <<<TSX
 interface Props {
@@ -206,7 +208,7 @@ interface Props {
     description?: string;
 }
 
-export default function {$filename.':'}({ title, description }: Props) {
+export default function {$componentName}({ title, description }: Props) {
     return (
         <div className="rounded border p-4">
             <h3 className="font-semibold">{title}</h3>
