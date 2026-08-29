@@ -24,10 +24,6 @@ class ModuleEnableCommand extends Command
 
         try {
             $modules->enable($name);
-            $integration->install($modules->find($name));
-            $this->line('');
-            $this->line('Next steps:');
-            $this->line('  1. Run: composer dump-autoload');
             $this->info("Module [{$name}] enabled.");
         } catch (ModuleNotFoundException $e) {
             $this->error($e->getMessage());
@@ -37,7 +33,15 @@ class ModuleEnableCommand extends Command
             $this->error($e->getMessage());
 
             return Command::FAILURE;
+        } catch (ModuleAlreadyEnabledException $e) {
+            $this->info("Module [{$name}] is already enabled.");
         }
+
+        $integration->install($modules->find($name));
+
+        $this->line('');
+        $this->line('Next steps:');
+        $this->line('  1. Run: composer dump-autoload');
 
         return Command::SUCCESS;
     }

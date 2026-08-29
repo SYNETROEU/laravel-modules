@@ -32,14 +32,21 @@ class InertiaAppIntegration
             return;
         }
 
-        $autoload = $composer['autoload']['psr-4'] ?? [];
+        $autoload = $composer['autoload'] ?? [];
 
-        if (isset($autoload['Modules\\'])) {
+        if (! isset($autoload['classmap'])) {
+            $autoload['classmap'] = [];
+        }
+
+        $classmap = $autoload['classmap'];
+
+        if (in_array('Modules', $classmap, true)) {
             return;
         }
 
-        $autoload['Modules\\'] = 'Modules/';
-        $composer['autoload']['psr-4'] = $autoload;
+        $classmap[] = 'Modules';
+        $autoload['classmap'] = $classmap;
+        $composer['autoload'] = $autoload;
 
         $this->files->put($path, json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
     }
@@ -102,3 +109,4 @@ class InertiaAppIntegration
         $this->files->put($path, $content);
     }
 }
+

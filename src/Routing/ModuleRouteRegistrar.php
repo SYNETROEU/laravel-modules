@@ -10,6 +10,8 @@ use Synetro\LaravelModules\Contracts\ModuleManagerInterface;
 
 class ModuleRouteRegistrar
 {
+    private array $registered = [];
+
     public function __construct(
         protected ModuleManagerInterface $modules,
         protected Filesystem $files,
@@ -24,6 +26,10 @@ class ModuleRouteRegistrar
 
     protected function registerModuleRoutes(\Synetro\LaravelModules\Modules\Module $module): void
     {
+        if (isset($this->registered[$module->name()])) {
+            return;
+        }
+
         $routesPath = $module->path().'/Routes';
 
         if (! $this->files->isDirectory($routesPath)) {
@@ -46,6 +52,8 @@ class ModuleRouteRegistrar
                 ->name('api.'.$this->resolveName($module))
                 ->group($apiRoutes);
         }
+
+        $this->registered[$module->name()] = true;
     }
 
     protected function resolvePrefix(\Synetro\LaravelModules\Modules\Module $module): string
