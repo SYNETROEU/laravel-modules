@@ -7,6 +7,7 @@ namespace Synetro\LaravelModules\Console;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Synetro\LaravelModules\Contracts\ModuleManagerInterface;
+use Synetro\LaravelModules\Integration\InertiaAppIntegration;
 
 class ModuleMakeCommand extends Command
 {
@@ -19,7 +20,7 @@ class ModuleMakeCommand extends Command
 
     protected $description = 'Create a new module';
 
-    public function handle(ModuleManagerInterface $modules, Filesystem $files): int
+    public function handle(ModuleManagerInterface $modules, Filesystem $files, InertiaAppIntegration $integration): int
     {
         $name = $this->argument('name');
         $slug = strtolower($name);
@@ -53,6 +54,13 @@ class ModuleMakeCommand extends Command
         $this->line('Next steps:');
         $this->line("  1. Run: php artisan module:enable {$name}");
         $this->line("  2. Visit: /{$slug}");
+
+        $modules->discover();
+        $module = $modules->find($name);
+
+        if ($module) {
+            $integration->install($module);
+        }
 
         return Command::SUCCESS;
     }

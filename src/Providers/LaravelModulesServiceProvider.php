@@ -12,6 +12,7 @@ use Synetro\LaravelModules\Frontend\FrontendManager;
 use Synetro\LaravelModules\Inertia\InertiaPageResolver;
 use Synetro\LaravelModules\Routing\ModuleRouteRegistrar;
 use Synetro\LaravelModules\Support\ModuleCache;
+use Synetro\LaravelModules\Integration\InertiaAppIntegration;
 
 class LaravelModulesServiceProvider extends ServiceProvider
 {
@@ -37,6 +38,10 @@ class LaravelModulesServiceProvider extends ServiceProvider
 
         $this->app->singleton(ModuleCache::class, function ($app) {
             return new ModuleCache($app->make(Filesystem::class));
+        });
+
+        $this->app->singleton(InertiaAppIntegration::class, function ($app) {
+            return new InertiaAppIntegration($app->make(Filesystem::class));
         });
 
         $this->app->singleton(ModuleManagerInterface::class, ModuleManager::class);
